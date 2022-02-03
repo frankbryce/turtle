@@ -1,0 +1,4 @@
+numpy==1.21.4
+python-socketio==5.5.0
+Flask==2.0.2
+Flask-SocketIO==5.1.1
