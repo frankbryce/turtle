@@ -1,2 +1,6 @@
-# hello-app
-Basic Flask app with Python. Want to use it as a starting point for other python web apps where I want visual output for some experiment or another.
+# turtle
+Inspired by the Numberphile video ["Plotting Pi and Searching for Mona Lisa - Numberphile"](https://www.youtube.com/watch?v=tkC1HHuuk7c).
+
+First step was to reproduce the basics of putting the digits of pi with arbitrary bases.
+
+Next step is to put rational approximations overlayed on top of the original pictures.
