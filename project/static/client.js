@@ -17,16 +17,16 @@ function random(w, h) {
 }
 
 
-// DRAW = "PI";
-DRAW = "1/7";
-ndigits = 100n
-base = 10n
+DRAW = "PI";
+// DRAW = "1/7";
+ndigits = 40000n
+base = 4n
 ang = Math.PI/(Number(base)/2)  // base 10
-const stroke_width = 0.01;
+const stroke_width = 0.05;
 
 if (DRAW === "PI") {
     let x = 3n * (base ** (ndigits+20n));
-    let digits = x;
+    digits = x;
     {
         let i = 1n;
         while (x > 0) {
@@ -63,16 +63,9 @@ for (var i=0;i<ndigits;i++) {
     maxY = Math.max(curr[1], maxY);
 }
 
-function draw(context, pts) {
-    context.moveTo(pts[0][0], pts[0][1]);
-    for (var i=1;i<pts.length;i++) {
-        context.lineTo(pts[i][0], pts[i][1]);
-    }
+function draw(context, pt) {
+    context.lineTo(pt[0], pt[1]);
     return context;
-}
-
-function redraw() {
-    return container.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
 }
 
 var container = d3.select("#container")
@@ -81,8 +74,8 @@ var container = d3.select("#container")
 var path = container.append("path")
     .style("stroke", "black")
     .style("stroke-width", stroke_width)
-    .style("fill", "none")
-    .attr("d", draw(d3.path(), points[0]));
+    .style("fill", "none");
+
 
 const zoom = d3.zoom().on("zoom", e => {
     path.attr("transform", (transform = e.transform));
@@ -91,3 +84,12 @@ const zoom = d3.zoom().on("zoom", e => {
 
 container.call(zoom).call(zoom.transform, d3.zoomIdentity);
 
+pathCtx = d3.path();
+pathCtx.moveTo(points[0][0][0], points[0][0][1]);
+idx = 0;
+for (var i=1;i<points[0].length;i++) {
+    setTimeout(() => {
+	    idx++;
+	    path.attr("d", draw(pathCtx, points[0][idx]));
+    }, i);
+}
