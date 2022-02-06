@@ -16,23 +16,35 @@ function random(w, h) {
     socket.emit('random', w, h);
 }
 
-base = 4n
+
+// DRAW = "PI";
+DRAW = "1/7";
+ndigits = 100n
+base = 10n
 ang = Math.PI/(Number(base)/2)  // base 10
-ndigits = 10000n
+const stroke_width = 0.01;
 
-let x = 3n * (base ** (ndigits+20n));
-let pi = x;
-{
-	let i = 1n;
-	while (x > 0) {
-	        x = x * i / ((i + 1n) * 4n);
-        	pi += x / (i + 2n);
-	        i += 2n;
-	}
+if (DRAW === "PI") {
+    let x = 3n * (base ** (ndigits+20n));
+    let digits = x;
+    {
+        let i = 1n;
+        while (x > 0) {
+            x = x * i / ((i + 1n) * 4n);
+            digits += x / (i + 2n);
+            i += 2n;
+        }
+    }
+    digits = digits.toString(Number(base));
 }
-pi = pi.toString(Number(base));
-
-points=[[0,0]]
+else if (DRAW = "1/7") {
+    raw_repeat = [1,4,2,8,5,7];
+    digits = [];
+    for (var i=0;i<Number(ndigits);i++) {
+	    digits.push(raw_repeat[i % raw_repeat.length]);
+    }
+}
+points=[[[0,0]]]
 curr = [0,0];
 theta = 0;
 minX = 0;
@@ -40,44 +52,41 @@ minY = 0;
 maxX = 0;
 maxY = 0;
 for (var i=0;i<ndigits;i++) {
-	digit = pi[i];
-	theta += ang*digit;
-	curr[0] += Math.cos(theta);
-	curr[1] += Math.sin(theta);
-	points.push([curr[0], curr[1]])
-	minX = Math.min(curr[0], minX);
-	minY = Math.min(curr[1], minY);
-	maxX = Math.max(curr[0], maxX);
-	maxY = Math.max(curr[1], maxY);
+    digit = digits[i];
+    theta += ang*digit;
+    curr[0] += Math.cos(theta);
+    curr[1] += Math.sin(theta);
+    points[0].push([curr[0], curr[1]])
+    minX = Math.min(curr[0], minX);
+    minY = Math.min(curr[1], minY);
+    maxX = Math.max(curr[0], maxX);
+    maxY = Math.max(curr[1], maxY);
 }
 
-
-function draw(context) {
-	context.moveTo(points[0][0], points[0][1]);
-	for (var i=1;i<points.length;i++) {
-		context.lineTo(points[i][0], points[i][1]);
-	}
-	return context;
+function draw(context, pts) {
+    context.moveTo(pts[0][0], pts[0][1]);
+    for (var i=1;i<pts.length;i++) {
+        context.lineTo(pts[i][0], pts[i][1]);
+    }
+    return context;
 }
 
 function redraw() {
-	return container.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+    return container.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
 }
 
 var container = d3.select("#container")
-	.attr("viewBox", "" + minX + " " + minY + " " + (maxX-minX) + " " + (maxY-minY))
-
-const stroke_width = 0.1;
+    .attr("viewBox", "" + minX + " " + minY + " " + (maxX-minX) + " " + (maxY-minY))
 
 var path = container.append("path")
-	.style("stroke", "black")
-	.style("stroke-width", stroke_width)
-	.style("fill", "none")
-	.attr("d", draw(d3.path()));
+    .style("stroke", "black")
+    .style("stroke-width", stroke_width)
+    .style("fill", "none")
+    .attr("d", draw(d3.path(), points[0]));
 
 const zoom = d3.zoom().on("zoom", e => {
-	path.attr("transform", (transform = e.transform));
-	path.style("stroke-width", stroke_width / Math.sqrt(transform.k));
+    path.attr("transform", (transform = e.transform));
+    path.style("stroke-width", stroke_width / Math.sqrt(transform.k));
 });
 
 container.call(zoom).call(zoom.transform, d3.zoomIdentity);
