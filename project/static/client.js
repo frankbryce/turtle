@@ -16,9 +16,9 @@ function random(w, h) {
     socket.emit('random', w, h);
 }
 
-base = 3n
+base = 4n
 ang = Math.PI/(Number(base)/2)  // base 10
-ndigits = 100000n
+ndigits = 10000n
 
 let x = 3n * (base ** (ndigits+20n));
 let pi = x;
@@ -42,8 +42,8 @@ maxY = 0;
 for (var i=0;i<ndigits;i++) {
 	digit = pi[i];
 	theta += ang*digit;
-	curr[0] += 50*Math.cos(theta);
-	curr[1] += 50*Math.sin(theta);
+	curr[0] += Math.cos(theta);
+	curr[1] += Math.sin(theta);
 	points.push([curr[0], curr[1]])
 	minX = Math.min(curr[0], minX);
 	minY = Math.min(curr[1], minY);
@@ -60,9 +60,25 @@ function draw(context) {
 	return context;
 }
 
-d3.select("#field")
+function redraw() {
+	return container.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+}
+
+var container = d3.select("#container")
 	.attr("viewBox", "" + minX + " " + minY + " " + (maxX-minX) + " " + (maxY-minY))
-	.append("path")
-		.style("stroke", "black")
-		.style("fill", "none")
-		.attr("d", draw(d3.path()));
+
+const stroke_width = 0.1;
+
+var path = container.append("path")
+	.style("stroke", "black")
+	.style("stroke-width", stroke_width)
+	.style("fill", "none")
+	.attr("d", draw(d3.path()));
+
+const zoom = d3.zoom().on("zoom", e => {
+	path.attr("transform", (transform = e.transform));
+	path.style("stroke-width", stroke_width / Math.sqrt(transform.k));
+});
+
+container.call(zoom).call(zoom.transform, d3.zoomIdentity);
+
