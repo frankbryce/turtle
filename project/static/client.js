@@ -92,12 +92,15 @@ for (var j=0;j<points.length;j++) {
         .style("stroke", "black")
         .style("stroke-width", stroke_width)
         .style("fill", "none"));
-    const zoom = d3.zoom().on("zoom", e => {
+}
+
+const zoom = d3.zoom().on("zoom", e => {
+    for (var j=0;j<points.length;j++) {
         paths[j].attr("transform", (transform = e.transform));
         paths[j].style("stroke-width", stroke_width / Math.sqrt(transform.k));
-    });
-    container.call(zoom).call(zoom.transform, d3.zoomIdentity);
-}
+    }
+});
+container.call(zoom).call(zoom.transform, d3.zoomIdentity);
 
 var idx = 0;
 var jidx = 0;
